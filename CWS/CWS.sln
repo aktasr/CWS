@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "CWS", "CWS\CWS.pyproj", "{BCDB0581-B8B1-43BF-9A00-FD86F33F1E86}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCDB0581-B8B1-43BF-9A00-FD86F33F1E86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCDB0581-B8B1-43BF-9A00-FD86F33F1E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FDB13EEB-F16C-40DD-8DE4-4708F1454EA4}
+	EndGlobalSection
+EndGlobal
