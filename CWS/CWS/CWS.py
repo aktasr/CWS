@@ -11,6 +11,9 @@ import threading
 def onOrderbook(*args):
     print(args[0])
 
+def onMessage(*args):
+    print(args[0])
+
 def start():
     ''' start func '''
     
@@ -47,17 +50,21 @@ def start():
     thr.start()
     
     ''' parsed orderbook message is can be directly used in this func. 
-    User can use if want to use synchronously 
+    It can be used if want to use synchronously 
                       Symbol       Bids    Price   Amount     Asks     Price  Amount
     Format example: {'BTCUSDT' : {'bids':[[40000, 0.980][]], 'asks': [[40100, 0.980][]]}}
     When websocket sends an orderbook message, this event is called in websocket thread.'''    
     
     btc.onOrderbookMsg = onOrderbook
 
+    ''' raw data is can be directly used in this func.
+    It can be used if want to use synchronously.
+    Command out below code to try. '''
+    #btc.onMsg = onMessage
 
     '''Also parsed orderbook message is can be achieved at any time from another thread by using fetch_orderbook() function.
     It can be custumized giving symbol as a parameter f.e: fetch_orderbook(symbol = 'BTCTRY')
-    It can used if want to use asynchronously 
+    It can be used if want to use asynchronously 
     Command out below code to try it'''
     #while True:
     #  print(btc.fetch_orderbook(symbol='BTCTRY'))
