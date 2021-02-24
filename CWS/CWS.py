@@ -7,10 +7,16 @@ from binance import binance
 import time
 import asyncio
 from concurrent.futures import ProcessPoolExecutor
-import threading
+from threading import Lock, Thread
+from queue import Queue 
+
+
+messQueue = Queue()
 
 def onOrderbook(*args):
-    print(args[0])
+    #print(args[0])
+    if ('BTCTRY' in args[0][0]):
+        messQueue.put(args[0])
 
 def onMessage(*args):
     print(args[0])
@@ -47,11 +53,11 @@ def start():
 
 
     # start to thread for continuous websocket communication
-    thr1 = threading.Thread(target=btc.start)
+    thr1 = Thread(target=btc.start)
     thr1.daemon = True
     thr1.start()
     
-    thr = threading.Thread(target=bnc.start)
+    thr = Thread(target=bnc.start)
     thr.daemon = True
     thr.start()
 
@@ -61,7 +67,7 @@ def start():
     Format example: {'BTCUSDT' : {'bids':[[40000, 0.980][]], 'asks': [[40100, 0.980][]]}}
     When websocket sends an orderbook message, this event is called in websocket thread.'''    
     
-    #btc.onOrderbookMsg = onOrderbook
+    btc.onOrderbookMsg = onOrderbook
 
     ''' raw data is can be directly used in this func.
     It can be used if want to use synchronously.
@@ -83,6 +89,22 @@ def start():
         testBtcTurkChangeCount(btc,'BTCUSDT')
         testBinanceChangeCount(bnc,'BTCUSDT')
         duration += 1
+
+        #time.sleep(10)
+        
+        print("Get data from queue")
+       
+            
+        flushedData = 0
+        try:
+            while messQueue.qsize() > 0:
+                flushedData += 1
+                data =  messQueue.get(timeout = 0.1)
+        except :
+            print("Time is UP")
+            
+     
+        print("Last BTC MESSAGE received. flushed data count: ", flushedData)
         #print("BtcTurk BTCTRY: ",btc.fetch_orderbook(symbol='BTCTRY'))
         #print("BtcTurk BTCUSDT: ",btc.fetch_orderbook(symbol='BTCUSDT'))
         #print("Binance BTCTRY: ",bnc.fetch_orderbook(symbol='BTCTRY'))
