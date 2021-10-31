@@ -5,6 +5,7 @@ import json
 import asyncio
 import websocket as ws
 import inspect
+import time
 from base.lockable import lockable
 
 class exchange(object):
@@ -40,6 +41,7 @@ class exchange(object):
     Symbols = { 
         'BTCUSDT' : 'BTCUSDT',
         'BTCTRY' : 'BTCTRY',
+        'XRPUSDT' : 'XRPUSDT',
         'ALL' : 'ALL'
         }
 
@@ -61,6 +63,7 @@ class exchange(object):
     # events
     # used to get raw data
     onMsg = None
+    onCloseEvent = None
 
     # used to get parsed data
     onOrderbookMsg = None
@@ -78,7 +81,28 @@ class exchange(object):
                 setattr(self, key, settings[key])
 
         self.orderbooks = lockable({'BTCUSDT' : None,
-                                    'BTCTRY' : None})
+                                    'BTCTRY' : None,
+                                    'XRPUSDT' : None,
+                                    'ETHUSDT' : None,
+                                    'USDTTRY' : None,
+                                    'ADAUSDT' : None,
+                                    'TRXUSDT' : None,
+                                    'EOSUSDT' : None,
+                                    'DOTUSDT' : None,
+                                    'XTZUSDT' : None,
+                                    'MATICUSDT' : None,
+                                    'XRPTRY': None,
+                                    'ETHTRY': None,
+                                    'DOGETRY': None,
+                                    'DOGEUSDT': None,
+                                    'AVAXUSDT': None,
+                                    'AVAXTRY': None,
+                                    'SOLTRY': None,
+                                    'SOLUSDT': None,
+                                    'CHZTRY': None,
+                                    'DOTTRY': None,
+                                    'MATICTRY': None,
+                                    'NEOTRY': None})
 
     def describe(self):
         return {}
@@ -95,6 +119,11 @@ class exchange(object):
         if self.wsLogEnable is True:
             ws.enableTrace(self.wsLogEnable)
         self.websocket = ws.WebSocketApp(self.url, on_open = self.on_open, on_message = self.on_message, on_error = self.on_error, on_close = self.on_close)
+
+    def isAlive(self):
+        if self.websocket is not None :
+            return self.websocket.keep_running
+        return False
 
     def start(self):
         self.websocket.run_forever()
@@ -154,7 +183,8 @@ class exchange(object):
             #    self.subscribe_orderbook(x)
 
     def on_close(socket):
-        print("Socket closed\n")    
+        print("Socket closed\n")
+        exchange.callEvent(socket.onCloseEvent)
         socket.onClose()
 
     def on_error(socket, error):
@@ -193,6 +223,9 @@ class exchange(object):
         
         _orderbook = {}
         
+        if(timestamp is None):
+            timestamp = self.getTimeInMs()
+        
         bids = self.sort_by(self.parse_bids_asks(orderbook[bidsKey], priceKey, amountKey) if (bidsKey in orderbook) and isinstance(orderbook[bidsKey], list) else [], 0, True)
         asks = self.sort_by(self.parse_bids_asks(orderbook[asksKey], priceKey, amountKey) if (asksKey in orderbook) and isinstance(orderbook[asksKey], list) else [], 0)
         
@@ -225,10 +258,13 @@ class exchange(object):
             else:
                 raise ExchangeError('unrecognized bidask format: ' + str(bidasks[0]))
         return result
+
+    def getTimeInMs(self):
+        return time.time() * 1000 
     
     @staticmethod
     def callEvent(event, *args):
-        if inspect.isfunction(event):
+        if inspect.isfunction(event) or inspect.isroutine(event):
             event(args)
         else:
             #print(" Event is not function!\n")

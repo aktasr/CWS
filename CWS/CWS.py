@@ -15,8 +15,14 @@ messQueue = Queue()
 
 def onOrderbook(*args):
     #print(args[0])
-    if ('BTCTRY' in args[0][0]):
-        messQueue.put(args[0])
+
+    incomingOrderbook = args[0][0]
+
+    for item  in incomingOrderbook.items():
+        incomingSymbol = item[0]
+        if(incomingSymbol == 'BTCTRY'):
+            messQueue.put(item[1])
+        
 
 def onMessage(*args):
     print(args[0])
@@ -28,7 +34,7 @@ def start():
     also user can be subscribe all markets(symbols). F.e: suscriber_trade = ['all'] '''
 
     btc = btcturk(subscribe_orderbook=['BTCTRY','BTCUSDT'])
-    bnc = binance(subscribe_orderbook=['BTCUSDT', 'BTCTRY'])
+    bnc = binance(subscribe_orderbook=['BTCTRY'])
     
     ''' creates websocket, don't subscribe anything. After connection established, you can subscribe any channel for any symbol 
     command out below code and command above code to try it.'''
@@ -53,9 +59,9 @@ def start():
 
 
     # start to thread for continuous websocket communication
-    thr1 = Thread(target=btc.start)
-    thr1.daemon = True
-    thr1.start()
+    #thr1 = Thread(target=btc.start)
+    #thr1.daemon = True
+    #thr1.start()
     
     thr = Thread(target=bnc.start)
     thr.daemon = True
@@ -67,8 +73,25 @@ def start():
     Format example: {'BTCUSDT' : {'bids':[[40000, 0.980][]], 'asks': [[40100, 0.980][]]}}
     When websocket sends an orderbook message, this event is called in websocket thread.'''    
     
-    btc.onOrderbookMsg = onOrderbook
+    bnc.onOrderbookMsg = onOrderbook
 
+
+    time.sleep(2)
+    msgCount = 0
+    startTime = time.time()
+    try:
+        while msgCount < 50:
+            data =  messQueue.get(timeout = 10)
+            msgCount += 1
+            #print("message time: ", data['timestamp'])
+    except :
+        print("Time is UP")
+
+    endTime = time.time()
+
+    print("start time: ", startTime, "end time: ", endTime, "Msg Cnt: ", msgCount)
+
+    return
     ''' raw data is can be directly used in this func.
     It can be used if want to use synchronously.
     Command out below code to try. '''
@@ -82,9 +105,9 @@ def start():
     #  print(btc.fetch_orderbook(symbol='BTCTRY'))
     #  time.sleep(1)
 
-    testDelay = 0.1
-    testDuration = 600/testDelay
-    duration = 0
+    #testDelay = 0.1
+    #testDuration = 600/testDelay
+    #duration = 0
     while duration < testDuration:
         testBtcTurkChangeCount(btc,'BTCUSDT')
         testBinanceChangeCount(bnc,'BTCUSDT')

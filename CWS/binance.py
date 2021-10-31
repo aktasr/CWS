@@ -35,6 +35,28 @@ class binance(exchange):
             'Symbols': {
                 'BTCUSDT' : 'btcusdt',
                 'BTCTRY' : 'btctry',
+                'XRPUSDT' : 'xrpusdt',
+                'ETHUSDT' : 'ethusdt',
+                'USDTTRY' : 'usdttry',
+                'ADAUSDT' : 'adausdt',
+                'TRXUSDT' : 'trxusdt',
+                'EOSUSDT' : 'eosusdt',
+                'DOTUSDT' : 'dotusdt',
+                'XTZUSDT' : 'xtzusdt',
+                'BTCUSDT' : 'btcusdt',
+                'XRPTRY' : 'xrptry',                
+                'MATICUSDT' : 'maticusdt',
+                'ETHTRY' : 'ethtry',
+                'DOGETRY' : 'dogetry',
+                'DOGEUSDT' : 'dogeusdt',
+                'AVAXUSDT': 'avaxusdt',
+                'AVAXTRY': 'avaxtry',
+                'SOLTRY': 'soltry',
+                'SOLUSDT': 'solusdt',
+                'CHZTRY': 'chztry',
+                'DOTTRY': 'dottry',
+                'MATICTRY': 'matictry',
+                'NEOTRY': 'neotry',
                 'ALL' : 'all',
                 },
             'has': {
@@ -82,7 +104,7 @@ class binance(exchange):
         symbol = self.getSymbolFromStream(message['stream'])
         orderbook = message['data']
 
-        self.parse_orderbook(symbol, orderbook, 0)
+        self.parse_orderbook(symbol, orderbook)
     
     def onMessage(self, message):
         channel = self.getChannelFromStream(message['stream'])
